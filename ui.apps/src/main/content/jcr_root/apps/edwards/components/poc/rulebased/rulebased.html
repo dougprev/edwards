@@ -1,0 +1,127 @@
+<script>
+
+
+    // Callback function to execute when mutations are observed
+    const POCcallback = function(mutationsList, observer) {
+        for(let mutation of mutationsList) {
+            if (mutation.type === 'childList') {
+                var removedNodes = mutation.removedNodes;
+                var foundOne = false;
+                if (removedNodes && removedNodes.length>0) {
+                    for (i=0; (i<removedNodes.length) && (foundOne == false); i++) {
+                        var classes = removedNodes[i].classList;
+                        if (classes) {
+                            for (j=0; j<classes.length && !foundOne; j++) {
+                                if (classes[j] == "delegcf" || classes[j] == "delegxf" || classes[j] == "delegimage"
+                                    || classes[j] == "rulecf" || classes[j] == "rulexf" || classes[j] == "ruleimage"
+                                    || classes[j] == "informational") {
+                                    foundOne = true;
+                                    //console.log("foundOne removed");
+                                }
+                            }
+                        }
+                    }
+                }
+                var addedNodes = mutation.addedNodes;
+                if (addedNodes && addedNodes.length>0) {
+                    for (i=0; i<addedNodes.length && !foundOne; i++) {
+                        var classes = addedNodes[i].classList;
+                        if (classes) {
+                            for (j=0; j<classes.length && !foundOne; j++) {
+                                if (classes[j] == "delegcf" || classes[j] == "delegxf" || classes[j] == "delegimage"
+                                    || classes[j] == "rulecf" || classes[j] == "rulexf" || classes[j] == "ruleimage"
+                                    || classes[j] == "informational") {
+                                    foundOne = true;
+                                    //console.log("foundOne add");
+                                }
+                            }
+                        }
+                    }
+                }
+                if (foundOne) {
+                    //console.log("foundOne is: " + foundOne);
+                    POCRuleCollector();
+                    try {
+                        console.log("calling createDisclaimerList");
+                        createDisclaimerList();
+                    } catch(err) {
+                        console.log("Could not execute createDisclaimerList");
+                    }
+                }
+
+            }
+        }
+    };
+
+    // Create an observer instance linked to the callback function
+    const POCobserver = new MutationObserver(POCcallback);
+
+    const POCRuleCollector = function() {
+        var objRuleCollection = {};
+        var namevaluepairs = "";
+        objRuleCollection.destination = "${resource.path @context='unsafe'}";
+        console.log("Collecting rules...");
+        $('.pocRules').each(function(index){
+            var dataRuleSet = $(this).attr('data-rule-set');
+            if (dataRuleSet && dataRuleSet.length>0) {
+                var flagDisclaimer = dataRuleSet.substr(0,1);
+                var cntUpper = dataRuleSet.substr(2,1);
+                var cntLower = dataRuleSet.substr(4,1);
+                var flagFooter = dataRuleSet.substr(6,1);
+                var dataAssetPath = $(this).attr('data-asset-path');
+                var objRule = {};
+                objRule.assetPath = dataAssetPath;
+                objRule.disclaimer = flagDisclaimer == "0" ? "No disclaimer" : "Disclaimer included.";
+                objRule.upperItems = cntUpper + " required components above.";
+                objRule.lowerItems = cntLower + " required components below.";
+                objRule.footer = flagFooter == "0" ? "No footer required." : "Footer required.";
+                objRuleCollection['item'+index] = objRule;
+                namevaluepairs += "./item"+index+"/assetPath="+objRule.assetPath+"&./item"+index+"/disclaimer="+objRule.disclaimer+"&";
+                namevaluepairs += "./item"+index+"/upperItems="+objRule.upperItems+"&./item"+index+"/lowerItems="+objRule.lowerItems+"&./item"+index+"/footer="+objRule.footer+"&";
+            }
+        });
+        console.log(objRuleCollection);
+        $.ajax({
+            type:"POST",
+            url:"${resource.path @context='unsafe'}", //"/bin/pfizer/setrules",
+            data:namevaluepairs, //JSON.stringify(objRuleCollection)
+            //contentType:"application/json",
+            //mimeType:"application/json",
+            //processData:false
+        });
+    }
+
+    $(document).ready(function(){
+        // Select the node that will be observed for mutations
+
+        //const POCtargetNode =  $('div.root.responsivegrid').get(0);// $('.delegcf').get(0);
+        var POCtargetNode =  $('div.ncontainer').get(0);
+        if (typeof POCtargetNode === 'undefined') {
+            POCtargetNode =  $('div.root.responsivegrid').get(0);
+        }
+
+        // Options for the observer (which mutations to observe)
+        const POCconfig = { attributes: true, childList: true, subtree: true };
+
+
+        // Start observing the target node for configured mutations
+        POCobserver.observe(POCtargetNode, POCconfig);
+
+        // if (window.Granite && window.Granite.author && window.Granite.author.MessageChannel) {
+        //     new window.Granite.author.MessageChannel("cqauthor", window).subscribeRequestMessage("rule-comp-notify", function(message) {
+        //         if (message.data) {
+        //             console.log("Message Data");
+        //             console.log(message);
+        //             }
+        //     });
+        // }
+        POCRuleCollector();
+    });
+
+</script>
+<div style="display:none;width: 100%;min-height:40px;border:1px solid #BBBBBB;" data-sly-use.rulebased="com.aem.metazine.core.models.Rules">
+    <div>Rules now working</div>
+    <div data-sly-list="${rulebased.rules}">
+        <p>${item}</p>
+    </div>
+</div>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspaceFilter version="1.0">
+    <filter root="/apps/edwards/clientlibs"/>
+    <filter root="/apps/edwards/components"/>
+    <filter root="/apps/edwards/i18n"/>
+</workspaceFilter>

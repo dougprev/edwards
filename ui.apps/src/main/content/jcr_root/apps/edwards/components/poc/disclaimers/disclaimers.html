@@ -1,0 +1,129 @@
+<sly data-sly-use.disclaimers="com.aem.metazine.core.models.Disclaimers">
+    <script>
+        // Callback function to execute when mutations are observed
+        const POCcallback = function(mutationsList, observer) {
+            for(let mutation of mutationsList) {
+                if (mutation.type === 'childList') {
+                    var removedNodes = mutation.removedNodes;
+                    var foundOne = false;
+                    if (removedNodes && removedNodes.length>0) {
+                        for (i=0; (i<removedNodes.length) && (foundOne == false); i++) {
+                            var classes = removedNodes[i].classList;
+                            if (classes) {
+                                for (j=0; j<classes.length && !foundOne; j++) {
+                                    if (classes[j] === "cfdeleg" || classes[j] === "xfdeleg" || classes[j] === "imagedeleg"
+                                        || classes[j] === "rulecf" || classes[j] === "rulexf" || classes[j] === "ruleimage"
+                                        || classes[j] === "informational") {
+                                        foundOne = true;
+                                        //console.log("foundOne removed");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    var addedNodes = mutation.addedNodes;
+                    if (addedNodes && addedNodes.length>0) {
+                        for (i=0; i<addedNodes.length && !foundOne; i++) {
+                            var classes = addedNodes[i].classList;
+                            if (classes) {
+                                for (j=0; j<classes.length && !foundOne; j++) {
+                                    if (classes[j] === "cfdeleg" || classes[j] === "xfdeleg" || classes[j] === "imagedeleg"
+                                        || classes[j] === "rulecf" || classes[j] === "rulexf" || classes[j] === "ruleimage"
+                                        || classes[j] === "informational") {
+                                        foundOne = true;
+                                        //console.log("foundOne add");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (foundOne) {
+                        //console.log("foundOne is: " + foundOne);
+                        //POCRuleCollector();
+                        try {
+                            console.log("calling createDisclaimerList");
+                            createDisclaimerList();
+                        } catch(err) {
+                            console.log("Could not execute createDisclaimerList");
+                        }
+                    }
+
+                }
+            }
+        };
+
+        // Create an observer instance linked to the callback function
+        const POCobserver = new MutationObserver(POCcallback);
+
+        function createDisclaimerList() {
+            var htmlString = "";
+            var indexCount = 1;
+            var symbols = ['&#134;','&#135;','*'];
+            var symbolCount = 0;
+
+            $('.pocDisclaimer').each(function(index){
+                var disclaimerText = $(this).text();
+                if (disclaimerText && disclaimerText.length>0) {
+                    var $parent = $(this).parent();
+                    var toFix = $parent.find("*:contains('{{*}}'),*[originaltext]");
+                    if (toFix && toFix.length > 0) {
+                        console.log("have toFix");
+
+                        toFix.each(function(){
+                            var originalText = $(this).attr("originaltext");
+                            var newHTML = $(this).html();
+
+                            newHTML = newHTML.replace("{<!-- -->{","{{");
+                            console.log("newHTML: " + newHTML);
+                            var newText = htmlEscape(newHTML); //$(this).text();
+                            console.log("newText: " + newText);
+                            if (typeof originalText === 'undefined') {
+                                $(this).attr("originaltext",newText);
+                            } else {
+                                newHTML = htmlUnescape(originalText);
+                            }
+                            $(this).html(newHTML.replace("{{*}}","<sup>" + (indexCount) + "</sup>"));
+                        });
+                        htmlString += "<li><sup>" + (indexCount) + "</sup> " + disclaimerText + "</li>";
+                        indexCount++;
+                    } else {
+                        //console.log("NOT toFix");
+                        var symbol = symbols[symbolCount % 3];
+                        symbolCount++;
+                        htmlString += "<li><sup>" + (symbol) + "</sup> " + disclaimerText + "</li>";
+                    }
+                }
+            });
+            //disclaimers from model for ul id in case of experience fragment has one
+            $('#disclaimerlist').html(htmlString);
+        }
+
+        $(document).ready(function(){
+            createDisclaimerList();
+        });
+
+        function htmlEscape(str) {
+            return str
+                .replace(/&/g, '&amp')
+                .replace(/'/g, '&apos')
+                .replace(/"/g, '&quot')
+                .replace(/>/g, '&gt')
+                .replace(/</g, '&lt');
+        }
+
+
+        function htmlUnescape(str) {
+            return str
+                .replace(/&amp/g, '&')
+                .replace(/&apos/g, "'")
+                .replace(/&quot/g, '"')
+                .replace(/&gt/g, '>')
+                .replace(/&lt/g, '<');
+        }
+    </script>
+    <div class="disclaimers-content">
+        <ul id="disclaimerlist">
+
+        </ul>
+    </div>
+</sly>

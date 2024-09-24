@@ -1,0 +1,36 @@
+
+<div data-sly-use.image="com.aem.metazine.core.models.ImageDeleg"
+     data-sly-use.templates="core/wcm/components/commons/v1/templates.html"
+     data-sly-test="${image.src}"
+     data-cmp-dmimage="${image.dmImage}"
+     data-cmp-smartcroprendition="${image.smartCropRendition}"
+     data-cmp-src="${image.srcUriTemplate ? image.srcUriTemplate : image.src}"
+     data-asset-id="${image.uuid}"
+     id="${image.id}"
+     data-cmp-data-layer="${image.data.json}"
+     data-cmp-hook-image="imageV3"
+     class="cmp-image${!wcmmode.disabled ? ' cq-dd-image' : ''} ${!wcmmode.disabled && !wcmmode.preview ? image.approvalStatus : '' @ context='attribute'}"
+     itemscope itemtype="http://schema.org/ImageObject">
+    <sly data-sly-test="${image.titleLocation == 'top'}">
+        <span class="cmp-image__title" itemprop="caption" data-sly-test="${!image.displayPopupTitle && image.assetTitle}">${image.assetTitle}</span>
+    </sly>
+    <a data-sly-unwrap="${!image.imageLink.valid}"
+       class="cmp-image__link"
+       data-sly-attribute="${image.imageLink.htmlAttributes}"
+       data-cmp-clickable="${image.data ? true : false}">
+        <img src="${image.src}"
+             srcset="${image.srcset}"
+             loading="${image.lazyEnabled ? 'lazy' : ''}"
+             class="cmp-image__image"
+             itemprop="contentUrl"
+             width="${image.width}" height="${image.height}"
+             sizes="${image.sizes}"
+             alt="${image.alt || true}" title="${image.displayPopupTitle && image.title}"/>
+    </a>
+    <sly data-sly-test="${image.titleLocation == 'bottom'}">
+    <span class="cmp-image__title" itemprop="caption" data-sly-test="${!image.displayPopupTitle && image.assetTitle}">${image.assetTitle}</span>
+    </sly>
+    <meta itemprop="caption" content="${image.title}" data-sly-test="${image.displayPopupTitle && image.title}">
+    <div class="pocDisclaimer" style="display:none;">${image.disclaimer}</div>
+</div>
+<sly data-sly-call="${templates.placeholder @ isEmpty = !image.src, classAppend = 'cmp-image cq-dd-image'}"></sly>

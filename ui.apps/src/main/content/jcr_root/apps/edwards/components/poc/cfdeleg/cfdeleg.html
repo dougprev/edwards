@@ -1,0 +1,25 @@
+<sly data-sly-use.fragment="com.aem.metazine.core.models.CFDeleg"
+     data-sly-test="${properties.fragmentPath}" data-sly-use.cfTemplates="templates.html">
+    <div class="pocDisclaimer" style="display:none;">${fragment.disclaimer}</div>
+    <div class="pocRules" data-asset-title="${fragment.assetTitle}" data-asset-path="${fragment.assetPath}" data-rule-set="${fragment.ruleDescriptions}">
+        <ul class="directions" data-sly-list="${fragment.directions}">
+            <li>${item}</li>
+        </ul>
+        <ul class="includes" data-sly-list="${fragment.includes}">
+            <li>${item}</li>
+        </ul>
+        <ul class="excludes" data-sly-list="${fragment.excludes}">
+            <li>${item}</li>
+        </ul>
+    </div>
+    <div class="poc-content ${!wcmmode.disabled && !wcmmode.preview ? fragment.approvalStatus : '' @ context='attribute'}">
+        <sly data-sly-test.isParagraphMode="${fragment.elements.size == 1 && fragment.elements[0].isMultiLine && properties.displayMode == 'singleText'}">
+            <sly data-sly-call="${cfTemplates.paragraphs @ fragment=fragment, fragmentPath=properties.fragmentPath, wcmmode=wcmmode}"></sly>
+        </sly>
+        <sly data-sly-test="${!isParagraphMode}">
+            <sly data-sly-call="${cfTemplates.elements @ fragment=fragment, fragmentPath=properties.fragmentPath, wcmmode=wcmmode}"></sly>
+        </sly>
+    </div>
+</sly>
+<sly data-sly-use.template="core/wcm/components/commons/v1/templates.html"
+     data-sly-call="${template.placeholder @ isEmpty=!properties.fragmentPath || !fragment.elements || fragment.elements.isEmpty, classAppend='cq-dd-contentfragment'}"></sly>

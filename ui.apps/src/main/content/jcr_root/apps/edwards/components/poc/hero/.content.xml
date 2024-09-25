@@ -6,4 +6,4 @@
     jcr:title="Hero"
     sling:resourceSuperType="core/wcm/components/teaser/v2/teaser"
     imageDelegate="core/wcm/components/image/v3/image"
-    componentGroup="Metazine"/>
+    componentGroup="Edwards - Content"/>

@@ -3,4 +3,4 @@
           jcr:primaryType="cq:Component"
           jcr:title="Marketing Summary CF"
           sling:resourceSuperType="metazine/components/poc/cfdeleg"
-          componentGroup="Metazine"/>
+          componentGroup="Edwards - Content"/>

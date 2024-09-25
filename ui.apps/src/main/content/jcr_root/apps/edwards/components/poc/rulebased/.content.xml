@@ -3,4 +3,4 @@
     cq:isContainer="{Boolean}true"
     jcr:primaryType="cq:Component"
     jcr:title="Rule Based"
-    componentGroup="Metazine"/>
+    componentGroup="Edwards - Content"/>

@@ -3,4 +3,4 @@
           jcr:primaryType="cq:Component"
           jcr:title="Content Fragment POC"
           sling:resourceSuperType="core/wcm/components/contentfragment/v1/contentfragment"
-          componentGroup="Metazine"/>
+          componentGroup="Edwards - Content"/>
